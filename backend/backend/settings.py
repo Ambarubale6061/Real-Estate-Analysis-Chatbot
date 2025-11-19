@@ -5,7 +5,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-change-this-in-production'
 DEBUG = True
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = [
+    "real-estate-backend-aiv1.onrender.com",
+    "localhost",
+    "127.0.0.1"
+]
 
 INSTALLED_APPS = [
     'django.contrib.auth',
@@ -18,7 +23,6 @@ INSTALLED_APPS = [
 
     'api',
 ]
-
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -36,7 +40,6 @@ TEMPLATES = []
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# Database (sqlite for simplicity)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -44,10 +47,21 @@ DATABASES = {
     }
 }
 
-# Static files
 STATIC_URL = '/static/'
 
-# CORS (allow local React dev)
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "https://real-estate-analysis-chatbot-five.vercel.app",
+]
 
-# For pandas to read Excel, nothing special required here
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "OPTIONS",
+]
+
+CORS_ALLOW_HEADERS = [
+    "content-type",
+]
+
+CORS_ALLOW_CREDENTIALS = True

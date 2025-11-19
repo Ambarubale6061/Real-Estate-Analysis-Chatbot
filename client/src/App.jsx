@@ -33,6 +33,8 @@ const KPI = ({ icon, title, value, foot }) => (
 );
 
 export default function App() {
+  const API_URL = "https://real-estate-backend-aiv1.onrender.com/api/analyze/";
+
   const [query, setQuery] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -52,18 +54,24 @@ export default function App() {
 
   const sendQuery = async (q) => {
     if (!q.trim()) return;
+
     setMessages((prev) => [...prev, { id: Date.now(), from: "user", text: q }]);
     setLoading(true);
+
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/analyze/", {
+      const res = await axios.post(API_URL, {
         query: q,
       });
+
       const payload = res.data;
+
+      // Bot reply
       setMessages((prev) => [
         ...prev,
         { id: Date.now() + 1, from: "bot", text: payload.summary },
       ]);
 
+      // Data clean
       if (payload.data?.length > 0) {
         const cleaned = payload.data.map((r) => ({
           year: r.year ?? r.Year,
@@ -72,16 +80,19 @@ export default function App() {
           demand_index: Number(r.demand_index ?? r.Demand_Index ?? 0),
           supply_units: Number(r.supply_units ?? r.Supply_Units ?? 0),
         }));
+
         setResult({ data: cleaned, summary: payload.summary });
         setActiveLocality(payload.locality ?? cleaned[0]?.locality);
-      } else setResult(null);
+      } else {
+        setResult(null);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now(),
           from: "bot",
-          text: "Server error. Ensure backend is running.",
+          text: "Server error. Ensure backend is live.",
         },
       ]);
     } finally {
@@ -97,14 +108,17 @@ export default function App() {
 
   const kpiValues = (() => {
     if (!result) return { avgPrice: "—", avgDemand: "—", records: 0 };
+
     const avgPrice = Math.round(
       result.data.reduce((sum, r) => sum + r.price_per_sqft, 0) /
         result.data.length
     );
+
     const avgDemand = Math.round(
       result.data.reduce((sum, r) => sum + r.demand_index, 0) /
         result.data.length
     );
+
     return {
       avgPrice: `₹${avgPrice}`,
       avgDemand: `${avgDemand}/100`,
